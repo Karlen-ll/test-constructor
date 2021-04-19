@@ -1,5 +1,6 @@
 {
-  "name": "my-app",
+  "name": "test-constructor",
+  "author": "Pireverdiev Karlen",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
