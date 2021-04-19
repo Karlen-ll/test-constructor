@@ -1,8 +1,11 @@
 import { useState } from 'react';
+import {getArrayFromLocalStorage, setLocalStorageItem} from "utils/localStorage";
 import { addByIndex, changeArrayValue, moveArrayItem, removeArrayItem } from "utils/stateArray";
 
 // antd
-import { Switch, Select, Typography } from 'antd';
+import { Switch, Select, Typography, notification } from 'antd';
+
+import cn from "classnames";
 
 // components
 import Widget from "components/Widget";
@@ -10,30 +13,65 @@ import ButtonIcon from "components/ButtonIcon";
 
 
 function Constructor() {
+    function openNotification(message, description = '', type = 'info') {
+        notification[type]({ message: message, description: description, duration: 3 });
+    }
+
+    function saveFromLocalStorage(arr = blocks) {
+        setLocalStorageItem(LocalStorageKey, arr)
+    }
+
+    function setAndSaveBlocks(arr) {
+        setBlocks(arr);
+        saveFromLocalStorage(arr)
+    }
+
     function addBlock(value = defaultBlock) {
-        setBlocks([...blocks, value] );
+        setAndSaveBlocks([...blocks, value] );
     }
 
     function addBlockByIndex(index, value = defaultBlock) {
-        if (index === 0) setBlocks([value, ...blocks] );
-        else setBlocks( addByIndex(blocks, value, index) );
+        if (index === 0) setAndSaveBlocks([value, ...blocks] );
+        else setAndSaveBlocks( addByIndex(blocks, value, index) );
     }
 
     function changeBlockType(index, newType) {
-        setBlocks( changeArrayValue(blocks, 'type', newType, index) );
+        setAndSaveBlocks( changeArrayValue(blocks, 'type', newType, index, {content: ''}) );
     }
 
-    function moveBlock(from, to) { setBlocks( moveArrayItem(blocks, from, to) ); }
+    function moveBlock(from, to) { setAndSaveBlocks( moveArrayItem(blocks, from, to) ); }
 
-    function removeBlock(index) { setBlocks( removeArrayItem(blocks, index) ); }
+    function removeBlock(index) {
+        const objectType = typeMap[blocks[index].type];
+        setAndSaveBlocks( removeArrayItem(blocks, index) );
+        openNotification(
+            objectType + (objectType === typeMap.image ? ' удалено' : ' удалён'),
+            '',
+            'error'
+        );
+    }
+
+    function copyBlock(object) {
+        const objectType = typeMap[object.type];
+        setClipboard( object );
+        openNotification( objectType + (objectType === typeMap.image ? ' скопировано' : ' скопирован'));
+    }
 
     const
-        initialBlocks = [
+        LocalStorageKey = 'arrayOfBlocks',
+
+        initialBlocks = getArrayFromLocalStorage(LocalStorageKey, [
             {type: 'title', content: 'Добро пожаловать'},
             {type: 'text',  content: 'Включите режим "редактора" и внесите необходимые правки'}
-        ],
+        ]),
 
         defaultBlock = {type: 'title', content: 'Заголовок'},
+
+        typeMap = {
+            text: 'Текст',
+            title: 'Заголовок',
+            image: 'Изображение',
+        },
 
         { Text, Title } = Typography,
 
@@ -45,71 +83,97 @@ function Constructor() {
 
     return (
         <>
-            <header className="header">
-                <Title level={2}>h2. Ant Design</Title>
-                <span className="author">Pireverdiev Karlen</span>
+            <header>
+                <Title className="logo" level={ 2 }>Конструктор</Title>
 
                 <Switch checked={ isEditMode } onClick={ checked => setMode(checked) } />
             </header>
 
-            {
-                blocks.map((block, i) => (
-                    <div className="container" key={ block.type +'_block#' + i }>
-
+            <main className={ cn({ 'editMode': isEditMode })}>
+                {
+                    blocks.map((block, i) => (
+                        <div className="container" key={ block.type +'_block#' + i }>
                         {!isEditMode || (
-                            <>
-                                <div className="navigate">
-                                    <ButtonIcon
-                                        icon="up"
-                                        isHide={i === 0}
-                                        handleClick={() => moveBlock(i, --i)}
-                                    />
-
-                                    <ButtonIcon
-                                        icon="down"
-                                        isHide={i === blocks.length - 1}
-                                        handleClick={() => moveBlock(i, ++i)}
-                                    />
-
-                                    <ButtonIcon icon="copy" handleClick={() => setClipboard(block)}/>
-                                </div>
-
-                                <ButtonIcon handleClick={() => addBlockByIndex(i)}/>
+                            <div className="addition group">
+                                <ButtonIcon className="add-button" handleClick={() => addBlockByIndex(i)}/>
 
                                 <ButtonIcon
-                                    icon="insert" isHide={!clipboard}
-                                    handleClick={() => addBlockByIndex(i, clipboard)}
+                                    icon="insert"
+                                    isHide={!clipboard}
+                                    className="insert-button"
+                                    handleClick={() => addBlockByIndex(i, {...clipboard})}
                                 />
+                            </div>
+                            ) }
 
-                                <ButtonIcon icon="remove" handleClick={() => removeBlock(i)}/>
+                            <div className="wrapper">
+                                {!isEditMode || (
+                                    <>
+                                        <Text className="type" strong>{ typeMap[block.type] }</Text>
 
-                                <Select
-                                    defaultValue={ block.type }
-                                    style={{ width: 100 }}
-                                    onChange={value => changeBlockType(i, value)}
-                                >
-                                    <Option value="text">Text</Option>
-                                    <Option value="title">Title</Option>
-                                    <Option value="image">Image</Option>
-                                </Select>
-                            </>
-                        )}
+                                        <Select
+                                            className="select"
+                                            defaultValue={ block.type }
+                                            onChange={value => changeBlockType(i, value)}
+                                        >
+                                            <Option value="text">Text</Option>
+                                            <Option value="title">Title</Option>
+                                            <Option value="image">Image</Option>
+                                        </Select>
 
-                        <Widget
-                            data={ block }
-                            isEdit={ isEditMode }
-                            className="container"
+                                        <div className="navigate group">
+                                            <ButtonIcon
+                                                icon="up"
+                                                isHide={i === 0}
+                                                handleClick={() => moveBlock(i, --i)}
+                                            />
+
+                                            <ButtonIcon
+                                                icon="down"
+                                                isHide={i === blocks.length - 1}
+                                                handleClick={() => moveBlock(i, ++i)}
+                                            />
+
+                                            <ButtonIcon icon="copy" handleClick={() => copyBlock( block )}/>
+
+                                            <ButtonIcon
+                                                icon="remove"
+                                                className="remove-button"
+                                                handleClick={() => removeBlock(i)}
+                                            />
+                                        </div>
+                                    </>
+                                )}
+
+                                <Widget
+                                    data={ block }
+                                    isEdit={ isEditMode }
+                                    update={ saveFromLocalStorage }
+                                />
+                            </div>
+                        </div>
+                    ))
+                }
+
+                {!isEditMode || (
+                    <div className="addition group">
+                        <ButtonIcon handleClick={() => addBlock()}/>
+
+                        <ButtonIcon
+                            icon="insert"
+                            isHide={!clipboard}
+                            className="insert-button"
+                            handleClick={() => addBlock({...clipboard})}
                         />
                     </div>
-                ))
-            }
+                )}
+            </main>
 
-            {!isEditMode || (
-                <>
-                    <ButtonIcon icon="insert" isHide={!clipboard} handleClick={() => addBlock({...clipboard})}/>
-                    <ButtonIcon handleClick={() => addBlock()}/>
-                </>
-            )}
+            <footer>
+                <Title className="author" level={ 5 }>Pireverdiev Karlen</Title>
+
+                { !isEditMode || (<Text className="debug" type="secondary">Элементов на странице: { blocks.length }</Text>) }
+            </footer>
         </>
     );
 }

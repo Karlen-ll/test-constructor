@@ -8,10 +8,11 @@ function addByIndex(array, value, index = 0) {
     return changeArray(array, arr => arr.splice(index, 0, value));
 }
 
-function changeArrayValue(array, key, value, index = 0) {
+function changeArrayValue(array, key, value, index = 0, service = {}) {
     return changeArray(array, arr => arr[index] = {
         ...array[index],
-        [key]: value
+        [key]: value,
+        ...service
     });
 }
 

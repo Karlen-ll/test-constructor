@@ -11,7 +11,7 @@ import {
     PlusSquareOutlined
 } from '@ant-design/icons';
 
-function ButtonIcon({ handleClick, icon, isHide = false }) {
+function ButtonIcon({ handleClick, icon, className, isHide = false }) {
     const
         iconMap = {
             up:     UpOutlined,
@@ -37,6 +37,7 @@ function ButtonIcon({ handleClick, icon, isHide = false }) {
         <Tooltip title={ tooltipMap[icon] }>
             <Button
                 icon={ <Icon /> }
+                className={ className }
                 onClick={ handleClick }
             />
         </Tooltip>
@@ -51,6 +52,7 @@ ButtonIcon.defaultProps = {
 ButtonIcon.propTypes = {
     handleClick: PropTypes.func,
     isHide: PropTypes.bool,
+    className: PropTypes.string,
     icon: PropTypes.string,
 };
 
