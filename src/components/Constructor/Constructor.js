@@ -14,7 +14,7 @@ import cn from "classnames";
 import Block from "components/Block";
 import Header from "components/Header";
 import Footer from "components/Footer";
-import ButtonIcon from "components/ButtonIcon";
+import GroupButtons from "components/GroupButtons";
 
 
 function Constructor() {
@@ -22,7 +22,9 @@ function Constructor() {
     notification[type]({message: message, description: description, duration: 3});
   }
 
-  function saveFromLocalStorage(arr = blocks) { setLocalStorageItem(keyOfLocalStorage, arr) }
+  function saveFromLocalStorage(arr = blocks) {
+    setLocalStorageItem(keyOfLocalStorage, arr)
+  }
 
   function setAndSaveBlocks(arr) {
     setBlocks(arr);
@@ -46,10 +48,17 @@ function Constructor() {
     setAndSaveBlocks(changeArrayValue(blocks, 'content', value, index));
   }
 
-  function moveBlock(from, to) { setAndSaveBlocks(moveArrayItem(blocks, from, to)); }
+  function moveBlock(from, to) {
+    setAndSaveBlocks(moveArrayItem(blocks, from, to));
+  }
 
-  function moveUpBlock(index)   { moveBlock(index, --index); }
-  function moveDownBlock(index) { moveBlock(index, ++index); }
+  function moveUpBlock(index) {
+    moveBlock(index, --index);
+  }
+
+  function moveDownBlock(index) {
+    moveBlock(index, ++index);
+  }
 
   function removeBlock(index) {
     confirm({
@@ -95,7 +104,7 @@ function Constructor() {
               index={ index }
               isEdit={ isEditMode }
               isFirst={ index <= 0 }
-              isLast={ index >= blocks.length }
+              isLast={ index >= blocks.length - 1 }
               clipboard={ clipboard }
               copy={ copyBlock }
               remove={ removeBlock }
@@ -109,16 +118,18 @@ function Constructor() {
         }
 
         { !isEditMode || (
-          <div className="addition group">
-            <ButtonIcon handleClick={ () => addBlock() }/>
-
-            <ButtonIcon
-              icon="insert"
-              isHide={ !clipboard }
-              className="insert-button"
-              handleClick={ () => addBlock({...clipboard}) }
-            />
-          </div>
+          <GroupButtons
+            className="addition"
+            buttons={ [{
+              className: 'add-button',
+              onClick: () => addBlock()
+            },{
+              icon: 'insert',
+              isHide: !clipboard,
+              className: 'insert-button',
+              onClick: () => addBlock({...clipboard})
+            }] }
+          />
         ) }
       </main>
 

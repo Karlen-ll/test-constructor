@@ -7,16 +7,17 @@ import cn from "classnames";
 import ButtonIcon from "components/ButtonIcon";
 
 
-function GroupButtons({classNames, buttons}) {
+function GroupButtons({className, buttons}) {
   return (
-    <div className={ cn('group', classNames) }>
+    <div className={ cn('group', className) }>
       {
         buttons.map((button, index) => (
           <ButtonIcon
             icon={ button.icon }
             isHide={ button.isHide }
             className={ button.className }
-            handleClick={ () => button.onClick }
+            handleClick={ button.onClick }
+            key={ button.icon + '#' + index }
           />
         ))
       }
@@ -25,7 +26,7 @@ function GroupButtons({classNames, buttons}) {
 }
 
 GroupButtons.propTypes = {
-  classNames: PropTypes.string,
+  className: PropTypes.string,
   buttons: PropTypes.array,
 };
 

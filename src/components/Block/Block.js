@@ -6,7 +6,7 @@ import { Select, Typography } from 'antd';
 
 // Components
 import Widget from "components/Widget";
-import ButtonIcon from "components/ButtonIcon";
+import GroupButtons from "components/GroupButtons";
 
 
 function Block({
@@ -43,33 +43,34 @@ function Block({
           <Option value="image">{ typeMap.image }</Option>
         </Select>
 
-        <div className="navigate group">
-          <ButtonIcon
-            icon="up"
-            isHide={ isFirst }
-            handleClick={ () => moveUp(index) }
-          />
-
-          <ButtonIcon
-            icon="down"
-            isHide={ isLast }
-            handleClick={ () => moveDown(index) }
-          />
-
-          <ButtonIcon icon="copy" handleClick={ () => copy(data) }/>
-
-          <ButtonIcon
-            icon="remove"
-            className="remove-button"
-            handleClick={ () => remove(index) }
-          />
-        </div>
+        <GroupButtons
+          className="navigate"
+          buttons={ [{
+            icon: 'up',
+            isHide: isFirst,
+            className: 'move-button',
+            onClick: () => moveUp(index)
+          },{
+            icon: 'down',
+            isHide: isLast,
+            className: 'move-button',
+            onClick: () => moveDown(index)
+          },{
+            icon: 'copy',
+            className: 'copy-button',
+            onClick: () => copy(data)
+          },{
+            icon: 'remove',
+            className: 'remove-button',
+            onClick: () => remove(index)
+          }] }
+        />
       </>
     ) }
 
     <Widget
-      index={ index }
       data={ data }
+      index={ index }
       isEdit={ isEdit }
       update={ changeContent }
     />
@@ -80,16 +81,18 @@ function Block({
 
       { isEdit ? (
         <>
-          <div className="addition group">
-            <ButtonIcon className="add-button" handleClick={ () => addByIndex(index) }/>
-
-            <ButtonIcon
-              icon="insert"
-              isHide={ !clipboard }
-              className="insert-button"
-              handleClick={ () => addByIndex(index, {...clipboard}) }
-            />
-          </div>
+          <GroupButtons
+            className="addition"
+            buttons={ [{
+              className: 'add-button',
+              onClick: () => addByIndex(index)
+            },{
+              icon: 'insert',
+              isHide: !clipboard,
+              className: 'insert-button',
+              onClick: () => addByIndex(index, {...clipboard})
+            }] }
+          />
 
           <div className="wrapper">{ element }</div>
         </>
