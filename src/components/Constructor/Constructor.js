@@ -39,6 +39,11 @@ function Constructor() {
         setAndSaveBlocks( changeArrayValue(blocks, 'type', newType, index, {content: ''}) );
     }
 
+    function changeBlockContent(index, value) {
+        console.log(value)
+        setAndSaveBlocks( changeArrayValue(blocks, 'content', value, index) );
+    }
+
     function moveBlock(from, to) { setAndSaveBlocks( moveArrayItem(blocks, from, to) ); }
 
     function removeBlock(index) {
@@ -120,16 +125,17 @@ function Constructor() {
         )}
 
         <Widget
+            index={ i }
             data={ block }
             isEdit={ isEditMode }
-            update={ saveFromLocalStorage }
+            update={ changeBlockContent }
         />
     </>
 
     return (
         <>
             <header>
-                <Title className="logo" level={ 2 }>Конструктор</Title>
+                <Title className="logo" level={ 2 } onClick={() => setMode(false)}>Конструктор</Title>
 
                 <Switch checked={ isEditMode } onClick={ checked => setMode(checked) } />
             </header>
