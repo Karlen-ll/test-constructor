@@ -40,7 +40,6 @@ function Constructor() {
     }
 
     function changeBlockContent(index, value) {
-        console.log(value)
         setAndSaveBlocks( changeArrayValue(blocks, 'content', value, index) );
     }
 
