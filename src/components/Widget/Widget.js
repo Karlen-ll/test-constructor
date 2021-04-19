@@ -13,33 +13,41 @@ function Widget({ data, isEdit, update }) {
     }
 
     const
-        { Text, Title } = Typography,
+        { Paragraph , Title } = Typography,
         { TextArea } = Input;
 
     return isEdit ? (
         data.type === 'image' ?
-            <Upload onChange={e => {
-                const files = (e.target || window.event.srcElement).files;
+            <>
+                <Upload onChange={e => {
+                    const files = (e.target || window.event.srcElement).files;
 
-                try {
-                    if (FileReader && files && files.length) {
-                        const fr = new FileReader();
-                        fr.onload = () => setContent(data, fr.result);
-                        fr.readAsDataURL(files[0]);
+                    try {
+                        if (FileReader && files && files.length) {
+                            const fr = new FileReader();
+                            fr.onload = () => setContent(data, fr.result);
+                            fr.readAsDataURL(files[0]);
+                        }
+                    } catch (e) {
+                        console.warn(e)
                     }
-                } catch (e) {
-                    console.warn(e)
-                }
-            }}>
-                <Button icon={ <UploadOutlined /> }>Загрузить файл</Button>
-            </Upload> :
+                }}>
+                    <Button icon={ <UploadOutlined /> }>Загрузить файл</Button>
+                </Upload>
+
+                <Image
+                    className="image"
+                    src={ data.content }
+                    fallback={ img }
+                />
+            </> :
 
             <TextArea rows={ 3 } defaultValue={ data.content || '' } onChange={e => setContent(data, e.target.value)}/>
     ) : (
-        data.type === 'title' ? <Title level={ 1 }>{ data.content }</Title> :
-            data.type === 'text' ? <Text>{ data.content }</Text> :
+        data.type === 'title' ? <Title className="title" level={ 1 }>{ data.content }</Title> :
+            data.type === 'text' ? <Paragraph  className="text">{ data.content }</Paragraph > :
                 <Image
-                    width={ 200 }
+                    className="image"
                     src={ data.content }
                     fallback={ img }
                 />

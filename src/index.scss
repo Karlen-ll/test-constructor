@@ -1,7 +1,13 @@
 $padding: 30px;
 $half-padding: ($padding / 2);
-$border-color: fade-out(black, .8);
+
+$margin: 30px;
+$half-margin: ($margin / 2);
+
 $background-color: #f5f5f5;
+$border-color: fade-out(black, .8);
+
+$primary-color: #1890ff;
 
 body {
   margin: 0;
@@ -32,12 +38,13 @@ header {
   border-bottom: 1px solid $border-color;
 
   .ant-typography {
-    color: #1890ff;
+    color: $primary-color;
   }
 }
 
 footer {
   border-top: 1px solid $border-color;
+  background-color: $background-color
 }
 
 main {
@@ -56,6 +63,17 @@ main {
   position: relative;
 }
 
+.ant-image { margin: $margin 0; }
+
+.image {
+  width: 100%;
+  max-width: 800px;
+}
+
+.title {
+
+}
+
 .editMode {
   .container {
     margin-bottom: $half-padding;
@@ -67,7 +85,9 @@ main {
     background-color: $background-color;
     border: 1px dashed $border-color;
     padding: $half-padding;
-    margin-top: $half-padding;
+    margin-top: $half-margin;
+
+    .ant-image { margin: $half-margin 0 0; }
 
     &:hover {
       .remove-button {
@@ -79,7 +99,7 @@ main {
 
 .group {
   .ant-btn {
-    margin-right: ($padding / 4);
+    margin-right: ($margin / 4);
 
     &:last-child { margin-right: 0; }
   }
@@ -89,7 +109,7 @@ main {
   //.ant-btn { background-color: fade-out($background-color, .5); }
 }
 
-.navigate { margin-bottom: $half-padding; }
+.navigate { margin-bottom: $half-margin; }
 
 .type {
   left: 0;
@@ -115,9 +135,8 @@ main {
   opacity: 0;
 }
 
-.insert-button { color: darkgreen; }
+.insert-button { color: $primary-color; }
 
-.ant-image { margin: 1em 0; }
 
 // Media
 @media screen and (max-width: 475px) {
@@ -125,7 +144,7 @@ main {
 
   .group {
     .ant-btn {
-      margin-right: ($padding / 2);
+      margin-right: ($margin / 2);
     }
   }
 
@@ -136,7 +155,7 @@ main {
 
   .select {
     width: 100%;
-    margin-bottom: $half-padding;
+    margin-bottom: $half-margin;
   }
 
   .remove-button { opacity: 1; }

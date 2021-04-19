@@ -73,13 +73,58 @@ function Constructor() {
             image: 'Изображение',
         },
 
+        { Option } = Select,
         { Text, Title } = Typography,
 
         [blocks, setBlocks] = useState(initialBlocks),
         [isEditMode, setMode] = useState(false),
         [clipboard, setClipboard] = useState(null);
 
-    const { Option } = Select;
+    const Page = (block, i) => <>
+        {!isEditMode || (
+            <>
+                <Text className="type" strong>{ typeMap[block.type] }</Text>
+
+                <Select
+                    className="select"
+                    defaultValue={ block.type }
+                    onChange={value => changeBlockType(i, value)}
+                >
+                    <Option value="text">Text</Option>
+                    <Option value="title">Title</Option>
+                    <Option value="image">Image</Option>
+                </Select>
+
+                <div className="navigate group">
+                    <ButtonIcon
+                        icon="up"
+                        isHide={i === 0}
+                        handleClick={() => moveBlock(i, --i)}
+                    />
+
+                    <ButtonIcon
+                        icon="down"
+                        isHide={i === blocks.length - 1}
+                        handleClick={() => moveBlock(i, ++i)}
+                    />
+
+                    <ButtonIcon icon="copy" handleClick={() => copyBlock( block )}/>
+
+                    <ButtonIcon
+                        icon="remove"
+                        className="remove-button"
+                        handleClick={() => removeBlock(i)}
+                    />
+                </div>
+            </>
+        )}
+
+        <Widget
+            data={ block }
+            isEdit={ isEditMode }
+            update={ saveFromLocalStorage }
+        />
+    </>
 
     return (
         <>
@@ -93,64 +138,25 @@ function Constructor() {
                 {
                     blocks.map((block, i) => (
                         <div className="container" key={ block.type +'_block#' + i }>
-                        {!isEditMode || (
-                            <div className="addition group">
-                                <ButtonIcon className="add-button" handleClick={() => addBlockByIndex(i)}/>
 
-                                <ButtonIcon
-                                    icon="insert"
-                                    isHide={!clipboard}
-                                    className="insert-button"
-                                    handleClick={() => addBlockByIndex(i, {...clipboard})}
-                                />
-                            </div>
-                            ) }
+                            {isEditMode ? (
+                                <>
+                                    <div className="addition group">
+                                        <ButtonIcon className="add-button" handleClick={() => addBlockByIndex(i)}/>
 
-                            <div className="wrapper">
-                                {!isEditMode || (
-                                    <>
-                                        <Text className="type" strong>{ typeMap[block.type] }</Text>
+                                        <ButtonIcon
+                                            icon="insert"
+                                            isHide={!clipboard}
+                                            className="insert-button"
+                                            handleClick={() => addBlockByIndex(i, {...clipboard})}
+                                        />
+                                    </div>
 
-                                        <Select
-                                            className="select"
-                                            defaultValue={ block.type }
-                                            onChange={value => changeBlockType(i, value)}
-                                        >
-                                            <Option value="text">Text</Option>
-                                            <Option value="title">Title</Option>
-                                            <Option value="image">Image</Option>
-                                        </Select>
-
-                                        <div className="navigate group">
-                                            <ButtonIcon
-                                                icon="up"
-                                                isHide={i === 0}
-                                                handleClick={() => moveBlock(i, --i)}
-                                            />
-
-                                            <ButtonIcon
-                                                icon="down"
-                                                isHide={i === blocks.length - 1}
-                                                handleClick={() => moveBlock(i, ++i)}
-                                            />
-
-                                            <ButtonIcon icon="copy" handleClick={() => copyBlock( block )}/>
-
-                                            <ButtonIcon
-                                                icon="remove"
-                                                className="remove-button"
-                                                handleClick={() => removeBlock(i)}
-                                            />
-                                        </div>
-                                    </>
-                                )}
-
-                                <Widget
-                                    data={ block }
-                                    isEdit={ isEditMode }
-                                    update={ saveFromLocalStorage }
-                                />
-                            </div>
+                                    <div className="wrapper">{ Page(block, i) }</div>
+                                </>
+                            ) : (
+                                Page(block, i)
+                            )}
                         </div>
                     ))
                 }
